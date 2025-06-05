@@ -1,10 +1,10 @@
-import api from './api';
+import { authApi } from './api';
 
 const authService = {
   // Registrar nuevo usuario
   register: async (userData) => {
     try {
-      const response = await api.post('/auth/register', userData);
+      const response = await authApi.post('/register', userData);
       
       // NestJS devuelve ResponseDto con isSuccess cuando es exitoso
       if (response.data.isSuccess) {
@@ -54,7 +54,7 @@ const authService = {
   // Iniciar sesión
   login: async (credentials) => {
     try {
-      const response = await api.post('/auth/login', credentials);
+      const response = await authApi.post('/login', credentials);
       
       // Verificar si la respuesta es exitosa
       if (response.data.isSuccess && response.data.result) {
@@ -108,10 +108,21 @@ const authService = {
     }
   },
 
-  // Asignar rol a usuario
+  // Asignar rol a usuario - CORREGIDO CON TODOS LOS CAMPOS
   assignRole: async (email, role) => {
     try {
-      const response = await api.post('/auth/assignRole', { email, role });
+      // Crear payload completo con todos los campos requeridos
+      const payload = {
+        email: email,
+        name: email.split('@')[0], // Usar la parte antes del @ como nombre
+        phoneNumber: "0000000000", // Teléfono temporal
+        password: "TempPassword123!", // Password temporal 
+        role: role
+      };
+
+      console.log('Enviando payload:', payload); // Para debug
+
+      const response = await authApi.post('/assignRole', payload);
       
       if (response.data.isSuccess) {
         return {
@@ -130,6 +141,7 @@ const authService = {
       
       // Manejar errores HTTP específicos
       if (error.response) {
+        console.error('Response data:', error.response.data); // Para debug
         switch (error.response.status) {
           case 404: // Not Found - usuario no encontrado
             return {

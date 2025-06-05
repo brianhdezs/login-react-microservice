@@ -64,6 +64,69 @@ const Home = () => {
             </p>
           </div>
 
+          {/* Acciones principales */}
+          <div style={{
+            display: 'flex',
+            gap: '1rem',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            marginBottom: '3rem'
+          }}>
+            <Link 
+              to="/products"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                color: 'white',
+                padding: '16px 32px',
+                borderRadius: '16px',
+                textDecoration: 'none',
+                fontWeight: '700',
+                fontSize: '18px',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 8px 25px rgba(99, 102, 241, 0.4)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-3px)';
+                e.target.style.boxShadow = '0 12px 35px rgba(99, 102, 241, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 8px 25px rgba(99, 102, 241, 0.4)';
+              }}
+            >
+              <i className="bi bi-grid"></i>
+              Explorar Productos
+            </Link>
+
+            {isAuthenticated && (
+              <Link 
+                to="/dashboard"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                  color: 'white',
+                  padding: '16px 32px',
+                  borderRadius: '16px',
+                  textDecoration: 'none',
+                  fontWeight: '700',
+                  fontSize: '18px',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 8px 25px rgba(14, 165, 233, 0.4)'
+                }}
+              >
+                <i className="bi bi-speedometer2"></i>
+                Dashboard
+              </Link>
+            )}
+          </div>
+
           {isAuthenticated ? (
             <div style={{
               background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
@@ -82,25 +145,47 @@ const Home = () => {
               <p style={{ color: '#0284c7', marginBottom: '1.5rem' }}>
                 Estás autenticado y listo para explorar todas las funcionalidades.
               </p>
-              <Link 
-                to="/dashboard"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
-                  color: 'white',
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  textDecoration: 'none',
-                  fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 15px rgba(14, 165, 233, 0.3)'
-                }}
-              >
-                <i className="bi bi-speedometer2"></i>
-                Ir al Dashboard
-              </Link>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link 
+                  to="/products"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'white',
+                    color: '#0284c7',
+                    padding: '10px 20px',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    fontWeight: '600',
+                    border: '2px solid #0ea5e9',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <i className="bi bi-grid"></i>
+                  Ver Catálogo
+                </Link>
+                
+                <Link 
+                  to="/dashboard"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: '12px',
+                    textDecoration: 'none',
+                    fontWeight: '600',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 15px rgba(14, 165, 233, 0.3)'
+                  }}
+                >
+                  <i className="bi bi-speedometer2"></i>
+                  Panel de Control
+                </Link>
+              </div>
             </div>
           ) : (
             <div style={{

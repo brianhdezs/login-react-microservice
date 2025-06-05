@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { isAdmin } from '../../utils/auth';
 import '../../styles/layout.css';
 
 const Navbar = () => {
@@ -52,6 +53,18 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
+            <Link to="/products" className="nav-link">
+              <i className="bi bi-grid"></i> Productos
+            </Link>
+          </li>
+          {isAdmin(user) && (
+            <li>
+              <Link to="/admin/products/new" className="nav-link">
+                <i className="bi bi-plus-circle"></i> Nuevo Producto
+              </Link>
+            </li>
+          )}
+          <li>
             <Link to="/privacy" className="nav-link">
               <i className="bi bi-shield-check"></i> Privacidad
             </Link>
@@ -74,7 +87,15 @@ const Navbar = () => {
                 <div className="user-info">
                   <div className="user-name">{user?.name || user?.email}</div>
                   <div className="user-status">
-                    En línea <span className="status-indicator"></span>
+                    {isAdmin(user) ? (
+                      <>
+                        Administrador <span className="status-indicator" style={{ background: '#f59e0b' }}></span>
+                      </>
+                    ) : (
+                      <>
+                        En línea <span className="status-indicator"></span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <i className="bi bi-chevron-down"></i>
@@ -105,6 +126,34 @@ const Navbar = () => {
                   </div>
                   <span>Lista de Deseos</span>
                 </Link>
+
+                {isAdmin(user) && (
+                  <>
+                    <div style={{
+                      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                      margin: '0.5rem 0',
+                      paddingTop: '0.5rem'
+                    }}>
+                      <div className="dropdown-header" style={{ margin: '0 0.5rem', fontSize: '11px' }}>
+                        <i className="bi bi-gear"></i> Administración
+                      </div>
+                    </div>
+                    
+                    <Link to="/admin/products/new" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                      <div className="item-icon">
+                        <i className="bi bi-plus-circle"></i>
+                      </div>
+                      <span>Nuevo Producto</span>
+                    </Link>
+                    
+                    <Link to="/dashboard" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                      <div className="item-icon">
+                        <i className="bi bi-speedometer2"></i>
+                      </div>
+                      <span>Panel Admin</span>
+                    </Link>
+                  </>
+                )}
                 
                 <Link to="/settings" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
                   <div className="item-icon">

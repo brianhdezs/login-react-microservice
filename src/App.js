@@ -2,11 +2,16 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
-// Páginas
+// Páginas principales
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+
+// Páginas de productos
+import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail';
+import ProductForm from './pages/ProductForm';
 
 // Estilos globales
 import './styles/auth.css';
@@ -28,7 +33,15 @@ function App() {
             {/* Rutas protegidas */}
             <Route path="/dashboard" element={<Dashboard />} />
             
-            {/* Páginas adicionales (puedes agregar más después) */}
+            {/* Rutas de productos */}
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+            
+            {/* Rutas de administración de productos (solo ADMIN) */}
+            <Route path="/admin/products/new" element={<ProductForm />} />
+            <Route path="/admin/products/edit/:id" element={<ProductForm />} />
+            
+            {/* Páginas adicionales (placeholder) */}
             <Route path="/profile" element={<Dashboard />} />
             <Route path="/orders" element={<Dashboard />} />
             <Route path="/wishlist" element={<Dashboard />} />
