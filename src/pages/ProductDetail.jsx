@@ -278,10 +278,6 @@ const ProductDetail = () => {
                   gap: '1rem' 
                 }}>
                   <div>
-                    <strong style={{ color: '#374151' }}>ID:</strong>
-                    <p style={{ margin: '0.25rem 0 0 0', color: '#6b7280' }}>#{product.productId}</p>
-                  </div>
-                  <div>
                     <strong style={{ color: '#374151' }}>Categoría:</strong>
                     <p style={{ margin: '0.25rem 0 0 0', color: '#6b7280' }}>
                       {product.categoryName || 'Sin categoría'}

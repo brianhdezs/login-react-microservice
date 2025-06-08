@@ -51,22 +51,37 @@ const authService = {
     }
   },
 
-  // Iniciar sesión
+  // Iniciar sesión - VERSIÓN CORREGIDA
   login: async (credentials) => {
     try {
       const response = await authApi.post('/login', credentials);
+      
+      console.log('Login response:', response.data); // Debug
       
       // Verificar si la respuesta es exitosa
       if (response.data.isSuccess && response.data.result) {
         const { user, token } = response.data.result;
         
+        console.log('User data from server:', user); // Debug
+        
+        // Asegurarse de que el rol se incluya en el objeto usuario
+        const userWithRole = {
+          ...user,
+          // Si el rol viene en 'roles' como string, también ponerlo en 'role'
+          role: user.roles || user.role,
+          // Si el rol viene en 'role', también ponerlo en 'roles' como array
+          roles: user.roles ? (Array.isArray(user.roles) ? user.roles : [user.roles]) : (user.role ? [user.role] : [])
+        };
+        
+        console.log('Processed user data:', userWithRole); // Debug
+        
         // Guardar token y datos del usuario en localStorage
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('user', JSON.stringify(userWithRole));
         
         return {
           success: true,
-          user,
+          user: userWithRole,
           token,
           message: 'Inicio de sesión exitoso'
         };
@@ -108,7 +123,7 @@ const authService = {
     }
   },
 
-  // Asignar rol a usuario - CORREGIDO CON TODOS LOS CAMPOS
+  // Asignar rol a usuario - MÉTODO PARA USAR DIRECTAMENTE EN BASE DE DATOS
   assignRole: async (email, role) => {
     try {
       // Crear payload completo con todos los campos requeridos
@@ -120,7 +135,7 @@ const authService = {
         role: role
       };
 
-      console.log('Enviando payload:', payload); // Para debug
+      console.log('Enviando payload para asignar rol:', payload); // Para debug
 
       const response = await authApi.post('/assignRole', payload);
       
@@ -169,6 +184,22 @@ const authService = {
     }
   },
 
+  // MÉTODO TEMPORAL PARA FORZAR ROL DE ADMIN
+  forceAdminRole: () => {
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      const adminUser = {
+        ...currentUser,
+        role: 'ADMIN',
+        roles: ['ADMIN']
+      };
+      localStorage.setItem('user', JSON.stringify(adminUser));
+      console.log('Forced admin role for user:', adminUser);
+      return adminUser;
+    }
+    return null;
+  },
+
   // Cerrar sesión
   logout: () => {
     localStorage.removeItem('token');
@@ -176,10 +207,20 @@ const authService = {
     window.location.href = '/login';
   },
 
-  // Obtener usuario actual
+  // Obtener usuario actual - VERSIÓN MEJORADA
   getCurrentUser: () => {
     const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        console.log('Current user from localStorage:', user); // Debug
+        return user;
+      } catch (error) {
+        console.error('Error parsing user from localStorage:', error);
+        return null;
+      }
+    }
+    return null;
   },
 
   // Verificar si el usuario está autenticado

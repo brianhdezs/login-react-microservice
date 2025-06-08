@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Layout from '../components/Layout/Layout';
 import ProtectedRoute from '../components/Auth/ProtectedRoute';
 import { useAuth } from '../context/AuthContext';
+import { isAdmin } from '../utils/auth';
+import authService from '../services/authService';
+import ProductManagement from '../components/Admin/ProductManagement';
 
 const Dashboard = () => {
   const { user, assignRole } = useAuth();
@@ -11,6 +14,7 @@ const Dashboard = () => {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('info');
 
   const handleRoleAssignment = async (e) => {
     e.preventDefault();
@@ -30,6 +34,18 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const userIsAdmin = isAdmin(user);
+  
+  // Debug: mostrar información del usuario en consola
+  console.log('Current user in Dashboard:', user);
+  console.log('User is admin:', userIsAdmin);
+
+  // Función temporal para forzar rol de admin
+  const handleForceAdminRole = () => {
+    authService.forceAdminRole();
+    window.location.reload(); // Recargar para aplicar cambios
   };
 
   return (
@@ -62,6 +78,7 @@ const Dashboard = () => {
               ¡Bienvenido al Dashboard!
             </h1>
 
+            {/* Información del Usuario */}
             <div style={{
               background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
               borderRadius: '16px',
@@ -69,7 +86,30 @@ const Dashboard = () => {
               marginBottom: '2rem',
               border: '1px solid #e2e8f0'
             }}>
-              <h2 style={{ color: '#1e293b', marginBottom: '1rem' }}>Información del Usuario</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h2 style={{ color: '#1e293b', margin: 0 }}>Información del Usuario</h2>
+                
+                {/* Botón temporal para debug - REMOVER EN PRODUCCIÓN 
+                {process.env.NODE_ENV === 'development' && (
+                  <button
+                    onClick={handleForceAdminRole}
+                    style={{
+                      background: '#f59e0b',
+                      color: 'white',
+                      padding: '8px 16px',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                    title="Solo para desarrollo - forzar rol ADMIN"
+                  >
+                    🔧 Forzar Admin (Dev)
+                  </button>
+                )}
+              </div>*/}
+              </div>
+              
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
                 <div>
                   <strong style={{ color: '#374151' }}>Nombre:</strong>
@@ -83,115 +123,247 @@ const Dashboard = () => {
                   <strong style={{ color: '#374151' }}>Teléfono:</strong>
                   <p style={{ margin: '0.5rem 0', color: '#6b7280' }}>{user?.phoneNumber}</p>
                 </div>
-                <div>
-                  <strong style={{ color: '#374151' }}>ID:</strong>
-                  <p style={{ margin: '0.5rem 0', color: '#6b7280', fontSize: '0.875rem' }}>{user?.id}</p>
+                {/*<div>
+                  <strong style={{ color: '#374151' }}>Rol Actual:</strong>
+                  <p style={{ 
+                    margin: '0.5rem 0', 
+                    color: userIsAdmin ? '#059669' : '#6b7280',
+                    fontWeight: userIsAdmin ? '600' : 'normal'
+                  }}>
+                    {user?.role || user?.roles || 'Sin rol definido'}
+                  </p>
                 </div>
-              </div>
+                <div>
+                  <strong style={{ color: '#374151' }}>Tipo de Usuario:</strong>
+                  <p style={{ 
+                    margin: '0.5rem 0', 
+                    color: userIsAdmin ? '#059669' : '#6b7280',
+                    fontWeight: userIsAdmin ? '600' : 'normal'
+                  }}>
+                    {userIsAdmin ? 'ADMINISTRADOR' : 'USUARIO'}
+                  </p>
+                </div>*/}
+                
+                {/* Debug info solo en desarrollo */}
+               
+            </div>
             </div>
 
-            <div style={{
-              background: 'linear-gradient(135deg, #fef3f2 0%, #fee2e2 100%)',
-              borderRadius: '16px',
-              padding: '2rem',
-              border: '1px solid #fca5a5'
-            }}>
-              <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>
-                <i className="bi bi-shield-lock" style={{ marginRight: '0.5rem' }}></i>
-                Asignar Rol (Solo Administradores)
-              </h2>
-              
-              <form onSubmit={handleRoleAssignment} style={{ maxWidth: '500px' }}>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#374151',
-                    marginBottom: '0.5rem'
-                  }}>
-                    Email del Usuario:
-                  </label>
-                  <input
-                    type="email"
-                    value={roleForm.email}
-                    onChange={(e) => setRoleForm(prev => ({ ...prev, email: e.target.value }))}
+            {/* Contenido específico para ADMIN */}
+            {userIsAdmin ? (
+              <div>
+                {/* Tabs de navegación para admin */}
+                <div style={{
+                  display: 'flex',
+                  borderBottom: '2px solid #e2e8f0',
+                  marginBottom: '2rem'
+                }}>
+                  <button
+                    onClick={() => setActiveTab('roles')}
                     style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #d1d5db',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      transition: 'all 0.3s ease',
-                      fontFamily: 'Inter, sans-serif'
-                    }}
-                    placeholder="usuario@ejemplo.com"
-                    required
-                  />
-                </div>
-
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#374151',
-                    marginBottom: '0.5rem'
-                  }}>
-                    Rol:
-                  </label>
-                  <select
-                    value={roleForm.role}
-                    onChange={(e) => setRoleForm(prev => ({ ...prev, role: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #d1d5db',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      transition: 'all 0.3s ease',
-                      fontFamily: 'Inter, sans-serif'
+                      padding: '12px 24px',
+                      border: 'none',
+                      background: activeTab === 'roles' ? '#6366f1' : 'transparent',
+                      color: activeTab === 'roles' ? 'white' : '#64748b',
+                      borderRadius: '8px 8px 0 0',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      marginRight: '1rem',
+                      transition: 'all 0.3s ease'
                     }}
                   >
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="USER">USER</option>
-                    <option value="MODERATOR">MODERATOR</option>
-                  </select>
+                    <i className="bi bi-shield-lock" style={{ marginRight: '0.5rem' }}></i>
+                    Asignar Roles
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('products')}
+                    style={{
+                      padding: '12px 24px',
+                      border: 'none',
+                      background: activeTab === 'products' ? '#6366f1' : 'transparent',
+                      color: activeTab === 'products' ? 'white' : '#64748b',
+                      borderRadius: '8px 8px 0 0',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <i className="bi bi-grid" style={{ marginRight: '0.5rem' }}></i>
+                    Gestión de Productos
+                  </button>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-                    color: 'white',
-                    padding: '12px 24px',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontWeight: '600',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.3s ease',
-                    fontFamily: 'Inter, sans-serif',
-                    opacity: loading ? 0.6 : 1
-                  }}
-                >
-                  {loading ? 'Asignando...' : 'Asignar Rol'}
-                </button>
-              </form>
+                {/* Contenido de los tabs */}
+                {activeTab === 'roles' && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, #fef3f2 0%, #fee2e2 100%)',
+                    borderRadius: '16px',
+                    padding: '2rem',
+                    border: '1px solid #fca5a5'
+                  }}>
+                    <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>
+                      <i className="bi bi-shield-lock" style={{ marginRight: '0.5rem' }}></i>
+                      Asignar Rol a Usuario
+                    </h2>
+                    
+                    <form onSubmit={handleRoleAssignment} style={{ maxWidth: '500px' }}>
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{
+                          display: 'block',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#374151',
+                          marginBottom: '0.5rem'
+                        }}>
+                          Email del Usuario:
+                        </label>
+                        <input
+                          type="email"
+                          value={roleForm.email}
+                          onChange={(e) => setRoleForm(prev => ({ ...prev, email: e.target.value }))}
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            border: '2px solid #d1d5db',
+                            borderRadius: '12px',
+                            fontSize: '16px',
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'Inter, sans-serif'
+                          }}
+                          placeholder="usuario@ejemplo.com"
+                          required
+                        />
+                      </div>
 
-              {message && (
-                <div style={{
-                  marginTop: '1rem',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  background: message.includes('exitosamente') ? '#d1fae5' : '#fee2e2',
-                  color: message.includes('exitosamente') ? '#059669' : '#dc2626',
-                  fontWeight: '600'
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{
+                          display: 'block',
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          color: '#374151',
+                          marginBottom: '0.5rem'
+                        }}>
+                          Rol:
+                        </label>
+                        <select
+                          value={roleForm.role}
+                          onChange={(e) => setRoleForm(prev => ({ ...prev, role: e.target.value }))}
+                          style={{
+                            width: '100%',
+                            padding: '12px 16px',
+                            border: '2px solid #d1d5db',
+                            borderRadius: '12px',
+                            fontSize: '16px',
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'Inter, sans-serif'
+                          }}
+                        >
+                          <option value="ADMIN">ADMIN</option>
+                          <option value="USER">USER</option>
+                          <option value="MODERATOR">MODERATOR</option>
+                        </select>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        style={{
+                          background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                          color: 'white',
+                          padding: '12px 24px',
+                          border: 'none',
+                          borderRadius: '12px',
+                          fontWeight: '600',
+                          cursor: loading ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.3s ease',
+                          fontFamily: 'Inter, sans-serif',
+                          opacity: loading ? 0.6 : 1
+                        }}
+                      >
+                        {loading ? 'Asignando...' : 'Asignar Rol'}
+                      </button>
+                    </form>
+
+                    {message && (
+                      <div style={{
+                        marginTop: '1rem',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        background: message.includes('exitosamente') ? '#d1fae5' : '#fee2e2',
+                        color: message.includes('exitosamente') ? '#059669' : '#dc2626',
+                        fontWeight: '600'
+                      }}>
+                        {message}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'products' && (
+                  <ProductManagement />
+                )}
+              </div>
+            ) : (
+              // Contenido para usuarios no administradores
+              <div style={{
+                background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                borderRadius: '16px',
+                padding: '2rem',
+                border: '1px solid #0ea5e9',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '3rem', color: '#0ea5e9', marginBottom: '1rem' }}>
+                  <i className="bi bi-person-circle"></i>
+                </div>
+                <h2 style={{ color: '#0369a1', marginBottom: '1rem' }}>
+                  Panel de Usuario
+                </h2>
+                <p style={{ color: '#0284c7', marginBottom: '1.5rem' }}>
+                  Bienvenido {user?.name}. Como usuario registrado, puedes:
+                </p>
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '1rem', 
+                  justifyContent: 'center', 
+                  flexWrap: 'wrap',
+                  marginTop: '2rem'
                 }}>
-                  {message}
+                  <div style={{
+                    background: 'white',
+                    padding: '1.5rem',
+                    borderRadius: '12px',
+                    border: '1px solid #0ea5e9',
+                    minWidth: '200px'
+                  }}>
+                    <i className="bi bi-grid" style={{ fontSize: '2rem', color: '#0ea5e9', marginBottom: '0.5rem' }}></i>
+                    <h3 style={{ color: '#0369a1', margin: '0.5rem 0' }}>Explorar Productos</h3>
+                    <p style={{ color: '#0284c7', fontSize: '14px' }}>Navega por nuestro catálogo premium</p>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '1.5rem',
+                    borderRadius: '12px',
+                    border: '1px solid #0ea5e9',
+                    minWidth: '200px'
+                  }}>
+                    <i className="bi bi-bag" style={{ fontSize: '2rem', color: '#0ea5e9', marginBottom: '0.5rem' }}></i>
+                    <h3 style={{ color: '#0369a1', margin: '0.5rem 0' }}>Realizar Compras</h3>
+                    <p style={{ color: '#0284c7', fontSize: '14px' }}>Añade productos a tu carrito</p>
+                  </div>
+                  <div style={{
+                    background: 'white',
+                    padding: '1.5rem',
+                    borderRadius: '12px',
+                    border: '1px solid #0ea5e9',
+                    minWidth: '200px'
+                  }}>
+                    <i className="bi bi-heart" style={{ fontSize: '2rem', color: '#0ea5e9', marginBottom: '0.5rem' }}></i>
+                    <h3 style={{ color: '#0369a1', margin: '0.5rem 0' }}>Lista de Deseos</h3>
+                    <p style={{ color: '#0284c7', fontSize: '14px' }}>Guarda tus productos favoritos</p>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </Layout>

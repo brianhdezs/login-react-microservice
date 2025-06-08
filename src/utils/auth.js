@@ -1,4 +1,4 @@
-// Utilidades para manejo de autenticación
+// Utilidades para manejo de autenticación - VERSIÓN CORREGIDA
 
 export const isTokenExpired = (token) => {
   if (!token) return true;
@@ -29,11 +29,53 @@ export const getUserFromToken = (token) => {
 };
 
 export const hasRole = (user, role) => {
-  return user?.roles?.includes(role) || false;
+  if (!user) return false;
+  
+  // Debug: log para ver qué contiene el usuario
+  console.log('Checking role for user:', user);
+  console.log('Looking for role:', role);
+  
+  // Verificar diferentes formas en que podría venir el rol
+  // 1. En un array de roles
+  if (user.roles && Array.isArray(user.roles)) {
+    const hasRoleInArray = user.roles.includes(role);
+    console.log('Role found in roles array:', hasRoleInArray);
+    return hasRoleInArray;
+  }
+  
+  // 2. En una propiedad role directa (como string)
+  if (user.role) {
+    const hasDirectRole = user.role === role;
+    console.log('Role found in direct role property:', hasDirectRole);
+    return hasDirectRole;
+  }
+  
+  // 3. En una propiedad roles como string (por si acaso)
+  if (user.roles && typeof user.roles === 'string') {
+    const hasRoleAsString = user.roles === role;
+    console.log('Role found as string:', hasRoleAsString);
+    return hasRoleAsString;
+  }
+  
+  console.log('No role found');
+  return false;
 };
 
 export const isAdmin = (user) => {
-  return hasRole(user, 'ADMIN');
+  console.log('Checking if user is admin:', user);
+  
+  // Verificar múltiples variaciones de "ADMIN"
+  const adminVariations = ['ADMIN', 'admin', 'Admin', 'ADMINISTRADOR', 'administrador'];
+  
+  for (const adminRole of adminVariations) {
+    if (hasRole(user, adminRole)) {
+      console.log(`User is admin with role: ${adminRole}`);
+      return true;
+    }
+  }
+  
+  console.log('User is not admin');
+  return false;
 };
 
 export const formatUserName = (user) => {
