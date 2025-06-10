@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { isAdmin } from '../utils/auth';
 import authService from '../services/authService';
 import ProductManagement from '../components/Admin/ProductManagement';
+import CouponManagement from '../components/Admin/CouponManagement';
 
 const Dashboard = () => {
   const { user, assignRole } = useAuth();
@@ -14,7 +15,7 @@ const Dashboard = () => {
   });
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('info');
+  const [activeTab, setActiveTab] = useState('roles'); // Cambiar valor inicial
 
   const handleRoleAssignment = async (e) => {
     e.preventDefault();
@@ -89,7 +90,7 @@ const Dashboard = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h2 style={{ color: '#1e293b', margin: 0 }}>Información del Usuario</h2>
                 
-                {/* Botón temporal para debug - REMOVER EN PRODUCCIÓN 
+                {/* Botón temporal para debug - REMOVER EN PRODUCCIÓN */}
                 {process.env.NODE_ENV === 'development' && (
                   <button
                     onClick={handleForceAdminRole}
@@ -107,7 +108,6 @@ const Dashboard = () => {
                     🔧 Forzar Admin (Dev)
                   </button>
                 )}
-              </div>*/}
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
@@ -123,7 +123,7 @@ const Dashboard = () => {
                   <strong style={{ color: '#374151' }}>Teléfono:</strong>
                   <p style={{ margin: '0.5rem 0', color: '#6b7280' }}>{user?.phoneNumber}</p>
                 </div>
-                {/*<div>
+                <div>
                   <strong style={{ color: '#374151' }}>Rol Actual:</strong>
                   <p style={{ 
                     margin: '0.5rem 0', 
@@ -142,11 +142,30 @@ const Dashboard = () => {
                   }}>
                     {userIsAdmin ? 'ADMINISTRADOR' : 'USUARIO'}
                   </p>
-                </div>*/}
+                </div>
                 
                 {/* Debug info solo en desarrollo */}
-               
-            </div>
+                {process.env.NODE_ENV === 'development' && (
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <strong style={{ color: '#374151' }}>Debug Info:</strong>
+                    <pre style={{ 
+                      margin: '0.5rem 0', 
+                      color: '#6b7280', 
+                      fontSize: '12px',
+                      background: '#f8fafc',
+                      padding: '8px',
+                      borderRadius: '4px',
+                      overflow: 'auto'
+                    }}>
+                      {JSON.stringify({ 
+                        role: user?.role, 
+                        roles: user?.roles, 
+                        isAdmin: userIsAdmin 
+                      }, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Contenido específico para ADMIN */}
@@ -156,7 +175,9 @@ const Dashboard = () => {
                 <div style={{
                   display: 'flex',
                   borderBottom: '2px solid #e2e8f0',
-                  marginBottom: '2rem'
+                  marginBottom: '2rem',
+                  flexWrap: 'wrap',
+                  gap: '0.5rem'
                 }}>
                   <button
                     onClick={() => setActiveTab('roles')}
@@ -168,8 +189,8 @@ const Dashboard = () => {
                       borderRadius: '8px 8px 0 0',
                       cursor: 'pointer',
                       fontWeight: '600',
-                      marginRight: '1rem',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      fontSize: '14px'
                     }}
                   >
                     <i className="bi bi-shield-lock" style={{ marginRight: '0.5rem' }}></i>
@@ -185,11 +206,29 @@ const Dashboard = () => {
                       borderRadius: '8px 8px 0 0',
                       cursor: 'pointer',
                       fontWeight: '600',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      fontSize: '14px'
                     }}
                   >
                     <i className="bi bi-grid" style={{ marginRight: '0.5rem' }}></i>
                     Gestión de Productos
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('coupons')}
+                    style={{
+                      padding: '12px 24px',
+                      border: 'none',
+                      background: activeTab === 'coupons' ? '#6366f1' : 'transparent',
+                      color: activeTab === 'coupons' ? 'white' : '#64748b',
+                      borderRadius: '8px 8px 0 0',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      transition: 'all 0.3s ease',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <i className="bi bi-ticket-perforated" style={{ marginRight: '0.5rem' }}></i>
+                    Gestión de Cupones
                   </button>
                 </div>
 
@@ -301,6 +340,10 @@ const Dashboard = () => {
 
                 {activeTab === 'products' && (
                   <ProductManagement />
+                )}
+
+                {activeTab === 'coupons' && (
+                  <CouponManagement />
                 )}
               </div>
             ) : (

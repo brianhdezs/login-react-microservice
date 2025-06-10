@@ -13,6 +13,9 @@ import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import ProductForm from './pages/ProductForm';
 
+// Páginas de cupones
+import CouponForm from './pages/CouponForm';
+
 // Estilos globales
 import './styles/auth.css';
 import './styles/layout.css';
@@ -40,6 +43,10 @@ function App() {
             {/* Rutas de administración de productos (solo ADMIN) */}
             <Route path="/admin/products/new" element={<ProductForm />} />
             <Route path="/admin/products/edit/:id" element={<ProductForm />} />
+
+            {/* Rutas de administración de cupones (solo ADMIN) */}
+            <Route path="/admin/coupons/new" element={<CouponForm />} />
+            <Route path="/admin/coupons/edit/:id" element={<CouponForm />} />
             
             {/* Páginas adicionales (placeholder) */}
             <Route path="/profile" element={<Dashboard />} />
