@@ -89,25 +89,6 @@ const Dashboard = () => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <h2 style={{ color: '#1e293b', margin: 0 }}>Información del Usuario</h2>
-                
-                {/* Botón temporal para debug - REMOVER EN PRODUCCIÓN */}
-                {process.env.NODE_ENV === 'development' && (
-                  <button
-                    onClick={handleForceAdminRole}
-                    style={{
-                      background: '#f59e0b',
-                      color: 'white',
-                      padding: '8px 16px',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      cursor: 'pointer'
-                    }}
-                    title="Solo para desarrollo - forzar rol ADMIN"
-                  >
-                    🔧 Forzar Admin (Dev)
-                  </button>
-                )}
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
@@ -123,48 +104,6 @@ const Dashboard = () => {
                   <strong style={{ color: '#374151' }}>Teléfono:</strong>
                   <p style={{ margin: '0.5rem 0', color: '#6b7280' }}>{user?.phoneNumber}</p>
                 </div>
-                <div>
-                  <strong style={{ color: '#374151' }}>Rol Actual:</strong>
-                  <p style={{ 
-                    margin: '0.5rem 0', 
-                    color: userIsAdmin ? '#059669' : '#6b7280',
-                    fontWeight: userIsAdmin ? '600' : 'normal'
-                  }}>
-                    {user?.role || user?.roles || 'Sin rol definido'}
-                  </p>
-                </div>
-                <div>
-                  <strong style={{ color: '#374151' }}>Tipo de Usuario:</strong>
-                  <p style={{ 
-                    margin: '0.5rem 0', 
-                    color: userIsAdmin ? '#059669' : '#6b7280',
-                    fontWeight: userIsAdmin ? '600' : 'normal'
-                  }}>
-                    {userIsAdmin ? 'ADMINISTRADOR' : 'USUARIO'}
-                  </p>
-                </div>
-                
-                {/* Debug info solo en desarrollo */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <strong style={{ color: '#374151' }}>Debug Info:</strong>
-                    <pre style={{ 
-                      margin: '0.5rem 0', 
-                      color: '#6b7280', 
-                      fontSize: '12px',
-                      background: '#f8fafc',
-                      padding: '8px',
-                      borderRadius: '4px',
-                      overflow: 'auto'
-                    }}>
-                      {JSON.stringify({ 
-                        role: user?.role, 
-                        roles: user?.roles, 
-                        isAdmin: userIsAdmin 
-                      }, null, 2)}
-                    </pre>
-                  </div>
-                )}
               </div>
             </div>
 
