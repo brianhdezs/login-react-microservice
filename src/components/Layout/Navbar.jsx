@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { isAdmin } from '../../utils/auth';
+import CartIcon from '../Cart/CartIcon';
 import '../../styles/layout.css';
 
 const Navbar = () => {
@@ -75,99 +76,119 @@ const Navbar = () => {
 
         <div className="auth-nav">
           {isAuthenticated ? (
-            <div className="user-menu" ref={dropdownRef}>
-              <button 
-                className="user-profile-btn" 
-                onClick={toggleDropdown}
-                aria-expanded={dropdownOpen}
-              >
-                <div className="user-avatar-nav">
-                  {getUserInitial()}
-                </div>
-                <div className="user-info">
-                  <div className="user-name">{user?.name || user?.email}</div>
-                  <div className="user-status">
-                    {isAdmin(user) ? (
-                      <>
-                        Administrador <span className="status-indicator" style={{ background: '#f59e0b' }}></span>
-                      </>
-                    ) : (
-                      <>
-                        En línea <span className="status-indicator"></span>
-                      </>
-                    )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              {/* Icono del carrito */}
+              <CartIcon />
+              
+              {/* Menú de usuario */}
+              <div className="user-menu" ref={dropdownRef}>
+                <button 
+                  className="user-profile-btn" 
+                  onClick={toggleDropdown}
+                  aria-expanded={dropdownOpen}
+                >
+                  <div className="user-avatar-nav">
+                    {getUserInitial()}
                   </div>
-                </div>
-                <i className="bi bi-chevron-down"></i>
-              </button>
-
-              <div className={`dropdown-menu ${dropdownOpen ? 'show' : ''}`}>
-                <div className="dropdown-header">
-                  <i className="bi bi-person-circle"></i> Mi Cuenta
-                </div>
-                
-                <Link to="/profile" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                  <div className="item-icon">
-                    <i className="bi bi-person"></i>
-                  </div>
-                  <span>Ver Perfil</span>
-                </Link>
-                
-                <Link to="/orders" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                  <div className="item-icon">
-                    <i className="bi bi-bag"></i>
-                  </div>
-                  <span>Mis Pedidos</span>
-                </Link>
-                
-                <Link to="/wishlist" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                  <div className="item-icon">
-                    <i className="bi bi-heart"></i>
-                  </div>
-                  <span>Lista de Deseos</span>
-                </Link>
-
-                {isAdmin(user) && (
-                  <>
-                    <div style={{
-                      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                      margin: '0.5rem 0',
-                      paddingTop: '0.5rem'
-                    }}>
-                      <div className="dropdown-header" style={{ margin: '0 0.5rem', fontSize: '11px' }}>
-                        <i className="bi bi-gear"></i> Administración
-                      </div>
+                  <div className="user-info">
+                    <div className="user-name">{user?.name || user?.email}</div>
+                    <div className="user-status">
+                      {isAdmin(user) ? (
+                        <>
+                          Administrador <span className="status-indicator" style={{ background: '#f59e0b' }}></span>
+                        </>
+                      ) : (
+                        <>
+                          En línea <span className="status-indicator"></span>
+                        </>
+                      )}
                     </div>
-                    
-                    <Link to="/admin/products/new" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                      <div className="item-icon">
-                        <i className="bi bi-plus-circle"></i>
-                      </div>
-                      <span>Nuevo Producto</span>
-                    </Link>
-                    
-                    <Link to="/dashboard" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                      <div className="item-icon">
-                        <i className="bi bi-speedometer2"></i>
-                      </div>
-                      <span>Panel Admin</span>
-                    </Link>
-                  </>
-                )}
-                
-                <Link to="/settings" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
-                  <div className="item-icon">
-                    <i className="bi bi-gear"></i>
                   </div>
-                  <span>Configuración</span>
-                </Link>
-                
-                <button className="dropdown-item logout-item" onClick={handleLogout}>
-                  <div className="item-icon">
-                    <i className="bi bi-box-arrow-right"></i>
-                  </div>
-                  <span>Cerrar Sesión</span>
+                  <i className="bi bi-chevron-down"></i>
                 </button>
+
+                <div className={`dropdown-menu ${dropdownOpen ? 'show' : ''}`}>
+                  <div className="dropdown-header">
+                    <i className="bi bi-person-circle"></i> Mi Cuenta
+                  </div>
+                  
+                  <Link to="/profile" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    <div className="item-icon">
+                      <i className="bi bi-person"></i>
+                    </div>
+                    <span>Ver Perfil</span>
+                  </Link>
+                  
+                  <Link to="/cart" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    <div className="item-icon">
+                      <i className="bi bi-cart3"></i>
+                    </div>
+                    <span>Mi Carrito</span>
+                  </Link>
+                  
+                  <Link to="/orders" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    <div className="item-icon">
+                      <i className="bi bi-bag"></i>
+                    </div>
+                    <span>Mis Pedidos</span>
+                  </Link>
+                  
+                  <Link to="/wishlist" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    <div className="item-icon">
+                      <i className="bi bi-heart"></i>
+                    </div>
+                    <span>Lista de Deseos</span>
+                  </Link>
+
+                  {isAdmin(user) && (
+                    <>
+                      <div style={{
+                        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                        margin: '0.5rem 0',
+                        paddingTop: '0.5rem'
+                      }}>
+                        <div className="dropdown-header" style={{ margin: '0 0.5rem', fontSize: '11px' }}>
+                          <i className="bi bi-gear"></i> Administración
+                        </div>
+                      </div>
+                      
+                      <Link to="/admin/products/new" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                        <div className="item-icon">
+                          <i className="bi bi-plus-circle"></i>
+                        </div>
+                        <span>Nuevo Producto</span>
+                      </Link>
+                      
+                      <Link to="/admin/coupons/new" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                        <div className="item-icon">
+                          <i className="bi bi-ticket-perforated"></i>
+                        </div>
+                        <span>Nuevo Cupón</span>
+                      </Link>
+                      
+                      <Link to="/dashboard" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                        <div className="item-icon">
+                          <i className="bi bi-speedometer2"></i>
+                        </div>
+                        <span>Panel Admin</span>
+                      </Link>
+                    </>
+                  )}
+                  
+                  <Link to="/settings" className="dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    <div className="item-icon">
+                      <i className="bi bi-gear"></i>
+                    </div>
+                    <span>Configuración</span>
+                  </Link>
+                  
+                  <button className="dropdown-item logout-item" onClick={handleLogout}>
+                    <div className="item-icon">
+                      <i className="bi bi-box-arrow-right"></i>
+                    </div>
+                    <span>Cerrar Sesión</span>
+                  </button>
+                </div>
               </div>
             </div>
           ) : (

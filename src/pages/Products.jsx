@@ -4,6 +4,7 @@ import Layout from '../components/Layout/Layout';
 import { useAuth } from '../context/AuthContext';
 import productService from '../services/productService';
 import { isAdmin } from '../utils/auth';
+import AddToCartButton from '../components/Cart/AddToCartButton';
 
 const Products = () => {
   const { user } = useAuth();
