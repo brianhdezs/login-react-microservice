@@ -4,6 +4,7 @@ import Layout from '../components/Layout/Layout';
 import { useAuth } from '../context/AuthContext';
 import productService from '../services/productService';
 import { isAdmin } from '../utils/auth';
+import AddToCartButton from '../components/Cart/AddToCartButton';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -16,7 +17,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     loadProduct();
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadProduct = async () => {
     setLoading(true);
@@ -132,7 +133,7 @@ const ProductDetail = () => {
     <Layout>
       <div style={{ 
         padding: '2rem',
-        maxWidth: '1200px',
+        maxWidth: '1400px',
         margin: '0 auto',
         minHeight: '70vh'
       }}>
@@ -171,27 +172,19 @@ const ProductDetail = () => {
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr', 
             gap: '0',
-            minHeight: '600px'
+            minHeight: '700px'
           }}>
-            {/* Imagen */}
+            {/* Sección de imagen mejorada */}
             <div style={{ 
               position: 'relative',
-              background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+              background: 'white',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              padding: '3rem',
               overflow: 'hidden'
             }}>
-              <img
-                src={productService.getImageUrl(product.imageUrl)}
-                alt={product.name}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  transition: 'transform 0.3s ease'
-                }}
-              />
+              {/* Categoría badge */}
               {product.categoryName && (
                 <div style={{
                   position: 'absolute',
@@ -204,14 +197,49 @@ const ProductDetail = () => {
                   fontSize: '14px',
                   fontWeight: '600',
                   backdropFilter: 'blur(10px)',
-                  boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)'
+                  boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
+                  zIndex: 2
                 }}>
                   {product.categoryName}
                 </div>
               )}
+
+              {/* Container de imagen proporcionada */}
+              <div style={{
+                width: '100%',
+                maxWidth: '600px',
+                height: '600px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                borderRadius: '20px',
+                overflow: 'hidden',
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #e2e8f0',
+                position: 'relative'
+              }}>
+                <img
+                  src={productService.getImageUrl(product.imageUrl)}
+                  alt={product.name}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain', // Cambio importante: contain en lugar de cover
+                    padding: '20px', // Padding para que no toque los bordes
+                    transition: 'transform 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'scale(1)';
+                  }}
+                />
+              </div>
             </div>
 
-            {/* Información */}
+            {/* Información del producto */}
             <div style={{ padding: '3rem' }}>
               <div style={{ marginBottom: '2rem' }}>
                 <h1 style={{
@@ -283,6 +311,16 @@ const ProductDetail = () => {
                       {product.categoryName || 'Sin categoría'}
                     </p>
                   </div>
+                  <div>
+                    <strong style={{ color: '#374151' }}>Disponibilidad:</strong>
+                    <p style={{ 
+                      margin: '0.25rem 0 0 0', 
+                      color: '#059669',
+                      fontWeight: '600'
+                    }}>
+                      En stock
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -292,39 +330,16 @@ const ProductDetail = () => {
                 gap: '1rem',
                 flexWrap: 'wrap'
               }}>
-                {/* Botón principal de compra (simulado) */}
-                <button
-                  style={{
-                    flex: 1,
-                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                    color: 'white',
-                    padding: '16px 24px',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontWeight: '700',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)',
-                    minWidth: '200px'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 8px 25px rgba(99, 102, 241, 0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 15px rgba(99, 102, 241, 0.3)';
-                  }}
-                  onClick={() => alert('Funcionalidad de compra próximamente')}
-                >
-                  <i className="bi bi-bag-plus"></i>
-                  Agregar al Carrito
-                </button>
+                {/* Botón principal de agregar al carrito */}
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <AddToCartButton 
+                    productId={product.productId}
+                    productName={product.name}
+                    variant="primary"
+                    size="large"
+                    showQuantity={true}
+                  />
+                </div>
 
                 {/* Acciones de administrador */}
                 {isAdmin(user) && (
@@ -379,6 +394,35 @@ const ProductDetail = () => {
                     </button>
                   </>
                 )}
+              </div>
+
+              {/* Información de envío */}
+              <div style={{
+                marginTop: '2rem',
+                padding: '1.5rem',
+                background: 'rgba(16, 185, 129, 0.1)',
+                borderRadius: '12px',
+                border: '1px solid rgba(16, 185, 129, 0.2)'
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  marginBottom: '0.5rem' 
+                }}>
+                  <i className="bi bi-truck" style={{ color: '#059669' }}></i>
+                  <strong style={{ color: '#065f46', fontSize: '14px' }}>
+                    Envío Gratis
+                  </strong>
+                </div>
+                <p style={{ 
+                  color: '#065f46', 
+                  fontSize: '13px', 
+                  margin: 0,
+                  lineHeight: '1.4'
+                }}>
+                  Entrega estimada: 2-3 días hábiles • Devoluciones gratis hasta 30 días
+                </p>
               </div>
 
               {/* Botón volver */}
